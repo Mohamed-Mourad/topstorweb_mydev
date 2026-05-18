@@ -2,6 +2,15 @@ import React, { useState } from 'react';
 import DiskIcon from './DiskIcon';
 import Button from './Common/Button';
 
+const poolNames = {
+    single: "Single Disk Pool",
+    volset: "Multiple disks no redundancy",
+    mirror: "Two mirrored disks",
+    raid5: "Single disk redundancy",
+    raid6: "Dual disk redundancy Pool",
+    raid6plus: "Triple disk redundancy Pool"
+};
+
 const PoolCard = ({
     poolName,
     data,
@@ -183,7 +192,7 @@ const PoolCard = ({
                                         </td>
                                         <td className="py-4 px-4">
                                             <span className="text-sm font-bold text-gray-700">
-                                                {type.charAt(0).toUpperCase() + type.slice(1)} Redundancy
+                                                {poolNames[type] || `${type.charAt(0).toUpperCase() + type.slice(1)} Redundancy`}
                                             </span>
                                         </td>
                                         <td className="py-4 px-4">

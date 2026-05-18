@@ -4,6 +4,24 @@ import PoolCard from './components/PoolCard';
 import Button from './components/Common/Button';
 import DiskIcon from './components/DiskIcon';
 
+const poolNames = {
+    single: "Single Disk Pool",
+    volset: "Multiple disks no redundancy",
+    mirror: "Two mirrored disks",
+    raid5: "Single disk redundancy",
+    raid6: "Dual disk redundancy Pool",
+    raid6plus: "Triple disk redundancy Pool"
+};
+
+const poolDescriptions = {
+    single: "No redundancy. Data is stored on a single disk.",
+    volset: "Performance only. Multi-disk striping, zero parity.",
+    mirror: "High availability. Data is duplicated across disks.",
+    raid5: "Single parity. Performance and safety balance.",
+    raid6: "Dual parity. Protection against two failures.",
+    raid6plus: "Triple parity. Protection against three failures."
+};
+
 const QDisks = () => {
     const [dgsData, setDgsData] = useState({
         disks: {},
@@ -296,15 +314,13 @@ const QDisks = () => {
                                                                          </td>
                                                                          <td className="px-6 py-4">
                                                                              <div className="flex flex-col">
-                                                                                 <span className="text-sm font-bold text-gray-700">{type.toUpperCase()}</span>
-                                                                                 <span className="text-[10px] text-gray-500 font-medium">
-                                                                                     {type === 'single' && 'No redundancy. Data is stored on a single disk.'}
-                                                                                     {type === 'mirror' && 'High availability. Data is duplicated across disks.'}
-                                                                                     {type === 'raid5' && 'Single parity. Performance and safety balance.'}
-                                                                                     {type === 'raid6' && 'Dual parity. Protection against two failures.'}
-                                                                                     {type === 'stripe' && 'Performance only. Multi-disk striping, zero parity.'}
+                                                                                 <span className="text-sm font-bold text-gray-700">
+                                                                                     {poolNames[type] || type.toUpperCase()}
                                                                                  </span>
-                                                                                 {(type === 'stripe' || type === 'single') && (
+                                                                                 <span className="text-[10px] text-gray-500 font-medium">
+                                                                                     {poolDescriptions[type] || ''}
+                                                                                 </span>
+                                                                                 {(type === 'volset' || type === 'single') && (
                                                                                      <span className="text-[9px] text-amber-600 font-black uppercase tracking-tighter mt-0.5">
                                                                                          ⚠️ No Redundancy
                                                                                      </span>
