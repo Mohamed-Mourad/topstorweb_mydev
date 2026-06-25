@@ -567,23 +567,20 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 relative">
-            <div className="absolute top-0 bottom-0 left-0 w-1 bg-emerald-500"></div>
+        <div className="overflow-hidden rounded-lg border border-border bg-surface shadow-sm">
             {/* Header */}
             <div
-                className="px-6 py-4 border-b border-gray-100 flex justify-between items-center cursor-pointer hover:bg-gray-50/50 transition-colors"
+                className="flex cursor-pointer select-none items-center justify-between gap-4 border-b border-border px-4 py-3.5 sm:px-5 sm:py-4"
                 onClick={() => setIsExpanded(!isExpanded)}
             >
                 <div className="flex items-center gap-3">
-                    <button className={`text-gray-400 hover:text-emerald-600 transition-all duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-                        <ChevronDown size={20} />
-                    </button>
-                    <h3 className="text-lg font-semibold text-gray-800">Running Nodes</h3>
+                    <ChevronDown size={18} className={`text-gray-400 transition-transform ${isExpanded ? '' : '-rotate-90'}`} />
+                    <h3 className="text-base font-semibold text-gray-800">Running Nodes</h3>
                 </div>
                 <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); getAllHostConfigs(); }}
-                    className="hidden sm:block bg-white border border-gray-200 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 font-medium text-sm px-4 py-2 rounded-lg shadow-sm transition-all"
+                    className="hidden items-center gap-2 rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-xs transition-colors hover:bg-gray-50 hover:text-brand-600 sm:inline-flex"
                 >
                     Download all configs
                 </button>
@@ -592,8 +589,8 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
             {isExpanded && (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                     {/* Nodes Grid */}
-                    <div className="p-6 bg-gray-50/50 border-b border-gray-100">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="hostsready">
+                    <div className="border-b border-border bg-surface-muted/50 p-5">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" id="hostsready">
                             {hosts.map(host => {
                                 const hostName = host.name || host.alias;
                                 return (
@@ -612,32 +609,30 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
                     </div>
 
                     {/* Config Form */}
-                    <div className="p-6" id="runninghosts">
-                        <form onSubmit={handleSubmit} className="space-y-6 hostform">
+                    <div className="p-5" id="runninghosts">
+                        <form onSubmit={handleSubmit} className="space-y-5 hostform">
 
                             {/* Join Cluster Switch */}
-                            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                            <div className="flex items-center gap-3 rounded-md border border-border bg-surface-muted px-4 py-3">
+                                <input
+                                    type="checkbox"
+                                    className="h-4 w-4 accent-brand-600 runningnodes"
+                                    id="customSwitch1"
+                                    name="configured"
+                                    checked={formData.configured}
+                                    onChange={handleChange}
+                                    disabled={!selectedHost}
+                                />
                                 <label className="text-sm font-medium text-gray-700">Ready to join an existing cluster</label>
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        className="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500 border-gray-300 transition runningnodes"
-                                        id="customSwitch1"
-                                        name="configured"
-                                        checked={formData.configured}
-                                        onChange={handleChange}
-                                        disabled={!selectedHost}
-                                    />
-                                </div>
                             </div>
 
                             {/* Node Name */}
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                                <label className="lg:col-span-3 text-sm font-semibold text-gray-700">Node Name</label>
+                                <label className="lg:col-span-3 text-sm font-medium text-gray-700">Node Name</label>
                                 <div className="lg:col-span-4">
                                     <input
                                         type="text"
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none text-gray-700 disabled:bg-gray-50 disabled:text-gray-400 runningnodes"
+                                        className="w-full px-4 py-2 rounded-md border border-border bg-surface focus:ring-4 focus:ring-brand-100 focus:border-brand-500 transition-colors outline-none text-gray-800 disabled:bg-gray-50 disabled:text-gray-400 runningnodes"
                                         id="BoxName"
                                         name="alias"
                                         value={formData.alias}
@@ -646,21 +641,21 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
                                         placeholder="Node Name"
                                     />
                                 </div>
-                                <div className="lg:col-span-5 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono text-center lg:text-left truncate">
+                                <div className="lg:col-span-5 px-4 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono text-center lg:text-left truncate">
                                     <span id="cBoxName">{selectedHost ? (selectedHost.alias || '') : 'select a node...'}</span>
                                 </div>
                             </div>
 
                             {/* Node Address */}
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                                <label className="lg:col-span-3 text-sm font-semibold text-gray-700">Node Address</label>
+                                <label className="lg:col-span-3 text-sm font-medium text-gray-700">Node Address</label>
                                 <div className="lg:col-span-9">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                                         <div className="flex gap-2">
                                             <input
                                                 type="text"
                                                 placeholder="xxx.xxx.xxx.xxx"
-                                                className="flex-1 min-w-0 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none text-gray-700 disabled:bg-gray-50 disabled:text-gray-400 ipaddress runningnodes"
+                                                className="flex-1 min-w-0 px-4 py-2 rounded-md border border-border bg-surface focus:ring-4 focus:ring-brand-100 focus:border-brand-500 transition-colors outline-none text-gray-800 disabled:bg-gray-50 disabled:text-gray-400 ipaddress runningnodes"
                                                 id="IPAddress"
                                                 name="ipaddr"
                                                 value={formData.ipaddr}
@@ -670,7 +665,7 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
                                             <input
                                                 type="number"
                                                 min="8" max="32" step="8"
-                                                className="w-20 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none text-gray-700 disabled:bg-gray-50 disabled:text-gray-400 runningnodes"
+                                                className="w-20 px-3 py-2 rounded-md border border-border bg-surface focus:ring-4 focus:ring-brand-100 focus:border-brand-500 transition-colors outline-none text-gray-800 disabled:bg-gray-50 disabled:text-gray-400 runningnodes"
                                                 id="ipaddrsubnet"
                                                 name="ipaddrsubnet"
                                                 value={formData.ipaddrsubnet}
@@ -680,13 +675,13 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
                                         </div>
                                         <div className="flex gap-4 items-center">
                                             <div className="flex-1">
-                                                <select ref={nmportsRef} className="select2 multiple w-full runningnodes" multiple="multiple" id="nmports" name="nmports" data-placeholder="Select ports" disabled={!selectedHost}>
+                                                <select ref={nmportsRef} className="select2 multiple w-full runningnodes h-[42px] rounded-md border border-border bg-surface px-3 text-sm text-gray-800 disabled:bg-gray-50 disabled:text-gray-400" multiple="multiple" id="nmports" name="nmports" data-placeholder="Select ports" disabled={!selectedHost}>
                                                 </select>
                                             </div>
-                                            <div className="px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono truncate">
+                                            <div className="px-3 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono truncate">
                                                 <span id="bNode">{bondInfo.bNode}</span>
                                             </div>
-                                            <div className="flex-1 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono truncate">
+                                            <div className="flex-1 px-4 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono truncate">
                                                 <span id="cIPAddress">{selectedHost ? `${selectedHost.ipaddr || ''}/${selectedHost.ipaddrsubnet || '24'}` : 'select a node...'}</span>
                                             </div>
                                         </div>
@@ -696,14 +691,14 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
 
                             {/* Cluster Address */}
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                                <label className="lg:col-span-3 text-sm font-semibold text-gray-700">Cluster Address</label>
+                                <label className="lg:col-span-3 text-sm font-medium text-gray-700">Cluster Address</label>
                                 <div className="lg:col-span-9">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                                         <div className="flex gap-2">
                                             <input
                                                 type="text"
                                                 placeholder="xxx.xxx.xxx.xxx"
-                                                className="flex-1 min-w-0 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none text-gray-700 disabled:bg-gray-50 disabled:text-gray-400 ipaddress runningnodes"
+                                                className="flex-1 min-w-0 px-4 py-2 rounded-md border border-border bg-surface focus:ring-4 focus:ring-brand-100 focus:border-brand-500 transition-colors outline-none text-gray-800 disabled:bg-gray-50 disabled:text-gray-400 ipaddress runningnodes"
                                                 id="Mgmt"
                                                 name="cluster"
                                                 value={formData.cluster}
@@ -713,7 +708,7 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
                                             <input
                                                 type="number"
                                                 min="8" max="32" step="8"
-                                                className="w-20 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none text-gray-700 disabled:bg-gray-50 disabled:text-gray-400 runningnodes"
+                                                className="w-20 px-3 py-2 rounded-md border border-border bg-surface focus:ring-4 focus:ring-brand-100 focus:border-brand-500 transition-colors outline-none text-gray-800 disabled:bg-gray-50 disabled:text-gray-400 runningnodes"
                                                 id="MgmtSub"
                                                 name="mgmtSub"
                                                 value={formData.mgmtSub}
@@ -723,13 +718,13 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
                                         </div>
                                         <div className="flex gap-4 items-center">
                                             <div className="flex-1">
-                                                <select ref={cmportsRef} className="select2 multiple w-full runningnodes" multiple="multiple" id="cmports" name="cmports" data-placeholder="Select ports" disabled={!selectedHost}>
+                                                <select ref={cmportsRef} className="select2 multiple w-full runningnodes h-[42px] rounded-md border border-border bg-surface px-3 text-sm text-gray-800 disabled:bg-gray-50 disabled:text-gray-400" multiple="multiple" id="cmports" name="cmports" data-placeholder="Select ports" disabled={!selectedHost}>
                                                 </select>
                                             </div>
-                                            <div className="px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono truncate">
+                                            <div className="px-3 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono truncate">
                                                 <span id="bCluster">{bondInfo.bCluster}</span>
                                             </div>
-                                            <div className="flex-1 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono truncate">
+                                            <div className="flex-1 px-4 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono truncate">
                                                 <span id="cMgmt">{selectedHost ? (selectedHost.cluster || '') : 'select a node...'}</span>
                                             </div>
                                         </div>
@@ -739,37 +734,37 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
 
                             {/* Data Ports */}
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                                <label className="lg:col-span-3 text-sm font-semibold text-gray-700">Data Ports</label>
+                                <label className="lg:col-span-3 text-sm font-medium text-gray-700">Data Ports</label>
                                 <div className="lg:col-span-4">
-                                    <select ref={dportsRef} className="select2 multiple w-full runningnodes" multiple="multiple" id="dports" name="dports" data-placeholder="Select ports" disabled={!selectedHost}>
+                                    <select ref={dportsRef} className="select2 multiple w-full runningnodes h-[42px] rounded-md border border-border bg-surface px-3 text-sm text-gray-800 disabled:bg-gray-50 disabled:text-gray-400" multiple="multiple" id="dports" name="dports" data-placeholder="Select ports" disabled={!selectedHost}>
                                     </select>
                                 </div>
-                                <div className="px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono truncate">
+                                <div className="px-3 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono truncate">
                                     <span id="bData">{bondInfo.bData}</span>
                                 </div>
-                                <div className="lg:col-span-4 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono truncate">
+                                <div className="lg:col-span-4 px-4 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono truncate">
                                     <span id="dataPorts">{selectedHost ? (parsePortDisplay(selectedHost.dports || selectedHost.dataport) || 'not set') : 'select a node...'}</span>
                                 </div>
                             </div>
 
                             {/* Internet Ports */}
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                                <label className="lg:col-span-3 text-sm font-semibold text-gray-700">Internet Ports</label>
+                                <label className="lg:col-span-3 text-sm font-medium text-gray-700">Internet Ports</label>
                                 <div className="lg:col-span-4">
-                                    <select ref={iportsRef} className="select2 multiple w-full runningnodes" multiple="multiple" id="iports" name="iports" data-placeholder="Select ports" disabled={!selectedHost}>
+                                    <select ref={iportsRef} className="select2 multiple w-full runningnodes h-[42px] rounded-md border border-border bg-surface px-3 text-sm text-gray-800 disabled:bg-gray-50 disabled:text-gray-400" multiple="multiple" id="iports" name="iports" data-placeholder="Select ports" disabled={!selectedHost}>
                                     </select>
                                 </div>
-                                <div className="px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono truncate">
+                                <div className="px-3 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono truncate">
                                     <span id="bInternet">{bondInfo.bInternet}</span>
                                 </div>
-                                <div className="lg:col-span-4 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono truncate">
+                                <div className="lg:col-span-4 px-4 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono truncate">
                                     <span id="internetPorts">{selectedHost ? (parsePortDisplay(selectedHost.iports) || 'not set') : 'select a node...'}</span>
                                 </div>
                             </div>
 
                             {/* Time Zone */}
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                                <label className="lg:col-span-3 text-sm font-semibold text-gray-700">Time Zone</label>
+                                <label className="lg:col-span-3 text-sm font-medium text-gray-700">Time Zone</label>
                                 <div className="lg:col-span-4">
                                     <select ref={tzRef} className="select2 w-full runningnodes" id="TZ" name="tz" disabled={!selectedHost}>
                                         {TIMEZONE_OPTIONS.map(opt => (
@@ -784,20 +779,20 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
                                         ))}
                                     </select>
                                 </div>
-                                <div className="lg:col-span-5 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono truncate">
+                                <div className="lg:col-span-5 px-4 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono truncate">
                                     <span id="cTZ">{selectedHost ? displayTZ(selectedHost.tz) : 'select a node...'}</span>
                                 </div>
                             </div>
 
                             {/* NTP Server */}
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                                <label className="lg:col-span-3 text-sm font-semibold text-gray-700">NTP Server</label>
+                                <label className="lg:col-span-3 text-sm font-medium text-gray-700">NTP Server</label>
                                 <div className="lg:col-span-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                                         <input
                                             type="text"
                                             placeholder="xxx.xxx.xxx.xxx"
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none text-gray-700 disabled:bg-gray-50 disabled:text-gray-400 ipaddress runningnodes"
+                                            className="w-full px-4 py-2 rounded-md border border-border bg-surface focus:ring-4 focus:ring-brand-100 focus:border-brand-500 transition-colors outline-none text-gray-800 disabled:bg-gray-50 disabled:text-gray-400 ipaddress runningnodes"
                                             id="NTP"
                                             name="ntp"
                                             value={formData.ntp}
@@ -809,7 +804,7 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
                                             <input
                                                 type="text"
                                                 placeholder="NTP Name"
-                                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none text-gray-700 disabled:bg-gray-50 disabled:text-gray-400 runningnodes"
+                                                className="w-full px-4 py-2 rounded-md border border-border bg-surface focus:ring-4 focus:ring-brand-100 focus:border-brand-500 transition-colors outline-none text-gray-800 disabled:bg-gray-50 disabled:text-gray-400 runningnodes"
                                                 id="NTPname"
                                                 name="ntpName"
                                                 value={formData.ntpName}
@@ -819,20 +814,20 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
                                         </div>
                                     </div>
                                 </div>
-                                <div className="lg:col-span-3 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono truncate">
+                                <div className="lg:col-span-3 px-4 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono truncate">
                                     <span id="cNTP">{selectedHost ? (selectedHost.ntp || 'select a node...') : 'select a node...'}</span>
                                 </div>
                             </div>
 
                             {/* DNS Server */}
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                                <label className="lg:col-span-3 text-sm font-semibold text-gray-700">DNS Server</label>
+                                <label className="lg:col-span-3 text-sm font-medium text-gray-700">DNS Server</label>
                                 <div className="lg:col-span-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                                         <input
                                             type="text"
                                             placeholder="xxx.xxx.xxx.xxx"
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none text-gray-700 disabled:bg-gray-50 disabled:text-gray-400 ipaddress runningnodes"
+                                            className="w-full px-4 py-2 rounded-md border border-border bg-surface focus:ring-4 focus:ring-brand-100 focus:border-brand-500 transition-colors outline-none text-gray-800 disabled:bg-gray-50 disabled:text-gray-400 ipaddress runningnodes"
                                             id="DNSname"
                                             name="dnsname"
                                             value={formData.dnsname}
@@ -844,7 +839,7 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
                                             <input
                                                 type="text"
                                                 placeholder="Domain Name"
-                                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none text-gray-700 disabled:bg-gray-50 disabled:text-gray-400 runningnodes"
+                                                className="w-full px-4 py-2 rounded-md border border-border bg-surface focus:ring-4 focus:ring-brand-100 focus:border-brand-500 transition-colors outline-none text-gray-800 disabled:bg-gray-50 disabled:text-gray-400 runningnodes"
                                                 id="DNSsearch"
                                                 name="dnssearch"
                                                 value={formData.dnssearch}
@@ -854,19 +849,19 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
                                         </div>
                                     </div>
                                 </div>
-                                <div className="lg:col-span-3 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono truncate">
+                                <div className="lg:col-span-3 px-4 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono truncate">
                                     <span id="cDNS">{selectedHost ? `${selectedHost.dnsname || ''}/${selectedHost.dnssearch || ''}` : 'select a node...'}</span>
                                 </div>
                             </div>
 
                             {/* Gateway */}
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                                <label className="lg:col-span-3 text-sm font-semibold text-gray-700">Gateway/router</label>
+                                <label className="lg:col-span-3 text-sm font-medium text-gray-700">Gateway/router</label>
                                 <div className="lg:col-span-4">
                                     <input
                                         type="text"
                                         placeholder="xxx.xxx.xxx.xxx"
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none text-gray-700 disabled:bg-gray-50 disabled:text-gray-400 ipaddress runningnodes"
+                                        className="w-full px-4 py-2 rounded-md border border-border bg-surface focus:ring-4 focus:ring-brand-100 focus:border-brand-500 transition-colors outline-none text-gray-800 disabled:bg-gray-50 disabled:text-gray-400 ipaddress runningnodes"
                                         id="GW"
                                         name="gw"
                                         value={formData.gw}
@@ -874,38 +869,32 @@ const RunningNodes = ({ hosts, allHosts, selectedHostName, onSelect, onRefresh }
                                         disabled={!selectedHost}
                                     />
                                 </div>
-                                <div className="lg:col-span-5 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 font-mono truncate">
+                                <div className="lg:col-span-5 px-4 py-2 rounded-md border border-border bg-surface-muted text-sm text-gray-600 font-mono truncate">
                                     <span id="cGW">{selectedHost ? (selectedHost.gw || '') : 'select a node...'}</span>
                                 </div>
                             </div>
 
                             {/* Actions */}
-                            <div className="pt-6 flex flex-col sm:flex-row gap-4 justify-between items-center border-t border-gray-100 mt-6">
+                            <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-border pt-5 sm:flex-row">
                                 <Button
                                     type="submit"
                                     id="readysubmit"
                                     disabled={!selectedHost}
-                                    bgColor="bg-emerald-600"
+                                    variant="primary"
                                     onClick={handleSubmit}
                                 >
                                     Update Node
                                 </Button>
 
-                                <button
+                                <Button
                                     type="button"
                                     id="getConfig"
                                     onClick={(e) => { e.stopPropagation(); getHostConfig(selectedHostName); }}
                                     disabled={!selectedHost}
-                                    className={`
-                                        w-full sm:w-auto px-6 py-2.5 rounded-lg font-medium transition-all duration-200 border
-                                        ${!selectedHost
-                                            ? 'border-gray-100 text-gray-300 cursor-not-allowed'
-                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-emerald-600'
-                                        }
-                                    `}
+                                    variant="secondary"
                                 >
                                     Download Config
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     </div>

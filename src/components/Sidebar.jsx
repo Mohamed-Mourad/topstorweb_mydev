@@ -1,8 +1,66 @@
 import React, { useState, useEffect } from 'react';
+import {
+    Database, PanelLeftClose, PanelLeftOpen, Search, ChevronDown,
+    Settings, SlidersHorizontal, Users, UserPlus, Server, Activity,
+    ClipboardList, BarChart3, HardDrive, AppWindow, Network, House,
+    Camera, Copy, Handshake, Send, Inbox, Layers, KeyRound, ArrowUpCircle,
+} from 'lucide-react';
+
+const menuItems = [
+    { label: 'Main menu', isHeader: true },
+    {
+        label: 'System configuration', icon: Settings,
+        subItems: [
+            { label: 'Users', icon: UserPlus, href: '#/users' },
+            { label: 'Groups', icon: Users, href: '#/groups' },
+            { label: 'Nodes', icon: Server, href: '#/nodes' },
+        ],
+    },
+    {
+        label: 'System Status', icon: Activity,
+        subItems: [
+            { label: 'Logs', icon: ClipboardList, href: '#/logs' },
+            { label: 'Service Performance', icon: BarChart3, href: '#/performance' },
+        ],
+    },
+    {
+        label: 'Volumes', icon: HardDrive,
+        subItems: [
+            { label: 'CIFS', icon: AppWindow, href: '#/volumes/cifs' },
+            { label: 'NFS', icon: Network, href: '#/volumes/nfs' },
+            { label: 'Home Folders', icon: House, href: '#/volumes/home' },
+            { label: 'ISCSI LUNs', icon: Database, href: '#/volumes/iscsi' },
+            { label: 'Snapshots', icon: Camera, href: '#/volumes/snapshots' },
+        ],
+    },
+    {
+        label: 'Replication', icon: Copy,
+        subItems: [
+            { label: 'Partner', icon: Handshake, href: '#/replication/partners' },
+            { label: 'Sender Schedule', icon: Send, href: '#/replication/sender' },
+            { label: 'Received Snapshots', icon: Inbox, href: '#/replication/received' },
+        ],
+    },
+    {
+        label: 'Pools', icon: Layers,
+        subItems: [
+            { label: 'Disk Groups', icon: Database, href: '#/pools/diskgroups' },
+        ],
+    },
+    {
+        label: 'Settings', icon: SlidersHorizontal,
+        subItems: [
+            { label: 'User Privileges', icon: KeyRound, href: '#/settings/privileges' },
+            { label: 'Updates', icon: ArrowUpCircle, href: '#/settings/updates' },
+        ],
+    },
+];
 
 const Sidebar = () => {
-    const [userExpanded, setUserExpanded] = useState(null);
     const [pathname, setPathname] = useState(window.location.hash || window.location.pathname);
+    const [userExpanded, setUserExpanded] = useState(null);
+    const [collapsed, setCollapsed] = useState(document.body.classList.contains('sidebar-collapse'));
+    const [query, setQuery] = useState('');
 
     useEffect(() => {
         const handleLocationChange = () => setPathname(window.location.hash || window.location.pathname);
@@ -14,216 +72,163 @@ const Sidebar = () => {
         };
     }, []);
 
-    const menuItems = [
-        {
-            label: 'Main menu',
-            isHeader: true
-        },
-        {
-            label: 'System configuration',
-            icon: 'fa fa-cogs',
-            subItems: [
-                { label: 'Users', icon: 'fas fa-user-plus', href: '#/users' },
-                { label: 'Groups', icon: 'fas fa-users', href: '#/groups' },
-                { label: 'Nodes', icon: 'fas fa-server', href: '#/nodes' }, // Stay in React
-            ]
-        },
-        {
-            label: 'System Status',
-            icon: 'fas fa-crosshairs',
-            subItems: [
-                { label: 'Logs', icon: 'fas fa-clipboard-list', href: '#/logs' },
-                { label: 'Service Performance', icon: 'far fa-chart-bar', href: '#/performance' },
-            ]
-        },
-        {
-            label: 'Volumes',
-            icon: 'fas fa-hdd',
-            subItems: [
-                { label: 'CIFS', icon: 'fab fa-windows', href: '#/volumes/cifs' },
-                { label: 'NFS', icon: 'fab fa-linux', href: '#/volumes/nfs' },
-                { label: 'Home Folders', icon: 'fas fa-house-user', href: '#/volumes/home' },
-                { label: 'ISCSI LUNs', icon: 'fas fa-database', href: '#/volumes/iscsi' },
-                { label: 'Snapshots', icon: 'fas fa-camera', href: '#/volumes/snapshots' },
-            ]
-        },
-        {
-            label: 'Replication',
-            icon: 'far fa-clone',
-            subItems: [
-                { label: 'Partner', icon: 'fas fa-hands-helping', href: '#/replication/partners' },
-                { label: 'Sender Schedule', icon: 'fab fa-perbyte', href: '#/replication/sender' },
-                { label: 'Received Snapshots', icon: 'fas fa-paper-plane', href: '#/replication/received' },
-            ]
-        },
-        {
-            label: 'Pools',
-            icon: 'fas fa-stream',
-            subItems: [
-                { label: 'Disk Groups', icon: 'fas fa-database', href: '#/pools/diskgroups' },
-            ]
-        },
-        {
-            label: 'Settings',
-            icon: 'fas fa-cog',
-            subItems: [
-                { label: 'User Privileges', icon: 'fas fa-unlock-alt', href: '#/settings/privileges' },
-                { label: 'Updates', icon: 'fas fa-pen-fancy', href: '#/settings/updates' },
-            ]
-        }
-    ];
-
     const isItemActive = (href) => {
         if (href.startsWith('#')) return pathname === href;
         const cleanPath = pathname.split('/').pop() || 'index.html';
-        const cleanHref = href.replace('./', '');
-        return cleanPath === cleanHref;
+        return cleanPath === href.replace('./', '');
     };
 
-    const activeParent = menuItems.find(menu =>
-        !menu.isHeader && menu.subItems.some(item => isItemActive(item.href))
-    )?.label;
+    const sections = menuItems.filter((m) => !m.isHeader);
+    const activeParent = sections.find((m) => m.subItems.some((s) => isItemActive(s.href)))?.label;
 
-    const handleToggle = (e, label) => {
-        e.preventDefault();
-        e.stopPropagation(); // Stop AdminLTE from seeing this click
+    // Desktop collapse contract — body.sidebar-collapse slides the rail off-canvas (index.css).
+    const toggleCollapse = () => {
+        const next = !collapsed;
+        document.body.classList.toggle('sidebar-collapse', next);
+        setCollapsed(next);
+    };
+
+    // Mobile drawer — close on backdrop tap or nav navigation.
+    const closeMobileDrawer = () => document.body.classList.remove('sidebar-mobile-open');
+
+    const handleSectionToggle = (label) => {
         if (label === activeParent) {
-            setUserExpanded(null);
+            setUserExpanded((prev) => (prev === label ? '__closed__' : null));
             return;
         }
-        setUserExpanded(prev => prev === label ? null : label);
+        setUserExpanded((prev) => (prev === label ? null : label));
     };
 
-    const isExpanded = (label) => label === activeParent || label === userExpanded;
+    const q = query.trim().toLowerCase();
+    const matches = (text) => text.toLowerCase().includes(q);
 
-    // Toggle Sidebar Logic
-    const [isSidebarOpen, setIsSidebarOpen] = useState(!document.body.classList.contains('sidebar-collapse'));
+    const visibleSections = sections
+        .map((menu) => {
+            if (!q) return menu;
+            if (matches(menu.label)) return menu;
+            const subItems = menu.subItems.filter((s) => matches(s.label));
+            return subItems.length ? { ...menu, subItems } : null;
+        })
+        .filter(Boolean);
 
-    const toggleSidebar = () => {
-        const body = document.body;
-        if (isSidebarOpen) {
-            body.classList.add('sidebar-collapse');
-        } else {
-            body.classList.remove('sidebar-collapse');
-        }
-        setIsSidebarOpen(!isSidebarOpen);
+    const isExpanded = (menu) => {
+        if (q) return true; // expand all while searching
+        if (menu.label === userExpanded) return true;
+        if (userExpanded === '__closed__' && menu.label === activeParent) return false;
+        if (userExpanded && userExpanded !== '__closed__') return menu.label === userExpanded;
+        return menu.label === activeParent;
     };
 
     return (
-        <aside className="main-sidebar elevation-0 sidebar-glass" style={{ width: '280px' }}>
-            {/* Floating Toggle Button */}
-            <button
-                onClick={toggleSidebar}
-                className="btn btn-link sidebar-toggle-btn"
-                style={{
-                    position: 'absolute',
-                    top: '15px',
-                    right: '-45px', // Floating just outside the sidebar
-                    zIndex: 9999,
-                    color: '#495BE2',
-                    fontSize: '1.4rem',
-                    transition: 'all 0.3s ease',
-                    background: 'transparent',
-                    border: 'none',
-                    outline: 'none'
-                }}
-            >
-                <i className={`fas ${isSidebarOpen ? 'fa-times' : 'fa-bars'}`} style={{ transition: 'transform 0.3s' }}></i>
-            </button>
+        <>
+            {/* Mobile drawer backdrop */}
+            <div className="sidebar-backdrop lg:hidden" onClick={closeMobileDrawer} />
 
-            {/* Brand Logo */}
-            <div className="brand-link">
-                <a href="#" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <img src="img/logo.png" width="180" style={{ filter: 'brightness(0.2)' }} alt="QuickStor" />
-                </a>
-            </div>
+            {/* Floating reopen button — only visible when collapsed on desktop */}
+            {collapsed && (
+                <button
+                    onClick={toggleCollapse}
+                    className="fixed left-3 top-3 z-50 hidden h-9 w-9 items-center justify-center rounded-md border border-border bg-surface text-gray-500 shadow-sm hover:bg-gray-50 hover:text-brand-600 lg:flex"
+                    title="Open sidebar"
+                >
+                    <PanelLeftOpen size={18} />
+                </button>
+            )}
 
-            {/* Sidebar */}
-            <div className="sidebar">
-                {/* Search Bar Refined - Width handled by CSS */}
-                <div className="form-inline mt-0 mb-1">
-                    <div className="input-group" style={{
-                        backgroundColor: 'rgba(0,0,0,0.03)',
-                        borderRadius: '12px',
-                        padding: '2px 8px',
-                        border: '1px solid rgba(0,0,0,0.05)',
-                        boxSizing: 'border-box'
-                    }}>
-                        <div className="input-group-prepend">
-                            <span className="input-group-text border-0 bg-transparent">
-                                <i className="fas fa-search text-muted" style={{ fontSize: '0.9rem' }}></i>
-                            </span>
-                        </div>
+            <aside className="app-sidebar fixed left-0 top-0 z-50 flex h-screen w-[260px] flex-col border-r border-border bg-surface">
+                {/* Brand */}
+                <div className="flex h-16 flex-shrink-0 items-center justify-between gap-2 border-b border-border px-4">
+                    <a href="#/" className="flex items-center gap-2" onClick={closeMobileDrawer}>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-md bg-brand-600 text-white">
+                            <Database size={16} />
+                        </span>
+                        <span className="text-[17px] font-semibold tracking-tight text-gray-900">QuickStor</span>
+                    </a>
+                    <button
+                        onClick={toggleCollapse}
+                        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-brand-600"
+                        title="Collapse sidebar"
+                    >
+                        <PanelLeftClose size={18} />
+                    </button>
+                </div>
+
+                {/* Search */}
+                <div className="flex-shrink-0 px-3 pt-3">
+                    <div className="relative">
+                        <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input
-                            className="form-control border-0 bg-transparent"
-                            style={{ fontSize: '0.9rem', color: '#4A4A68', boxShadow: 'none' }}
                             type="search"
-                            placeholder="Search menu..."
-                            aria-label="Search"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder="Search menu…"
+                            aria-label="Search menu"
+                            className="w-full rounded-md border border-border bg-surface-muted py-2 pl-9 pr-3 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-brand-500 focus:bg-surface focus:ring-4 focus:ring-brand-100"
                         />
                     </div>
                 </div>
 
-                {/* Sidebar Menu */}
-                <nav>
-                    <ul className="nav nav-pills nav-sidebar flex-column" role="menu">
-                        {menuItems.map((menu, idx) => {
-                            if (menu.isHeader) {
-                                return <li key={idx} className="nav-header">{menu.label}</li>;
-                            }
+                {/* Menu */}
+                <nav className="flex-1 overflow-y-auto px-3 py-3">
+                    <div className="px-2 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                        Main menu
+                    </div>
 
-                            const expanded = isExpanded(menu.label);
-                            const isActive = menu.label === activeParent;
+                    {visibleSections.map((menu) => {
+                        const Icon = menu.icon;
+                        const expanded = isExpanded(menu);
+                        const sectionActive = menu.label === activeParent;
 
-                            return (
-                                <li key={menu.label} className={`nav-item ${expanded ? 'menu-open' : ''}`}>
-                                    <a
-                                        href="#"
-                                        className={`nav-link ${isActive ? 'active' : ''}`}
-                                        onClick={(e) => handleToggle(e, menu.label)}
-                                        style={{ display: 'flex', alignItems: 'center' }}
-                                    >
-                                        <i className={`nav-icon ${menu.icon}`} style={{ fontSize: '1.1rem', width: '24px' }}></i>
-                                        <p style={{ marginLeft: '12px', flex: 1, fontWeight: '500' }}>
-                                            {menu.label}
-                                            <i className={`right fas fa-angle-left`} style={{
-                                                transition: 'transform 0.3s',
-                                                transform: expanded ? 'rotate(-90deg)' : 'rotate(0deg)',
-                                                fontSize: '0.8rem'
-                                            }}></i>
-                                        </p>
-                                    </a>
-                                    <ul
-                                        className="nav nav-treeview"
-                                        style={{
-                                            display: expanded ? 'block' : 'none',
-                                            overflow: 'hidden'
-                                        }}
-                                    >
-                                        {menu.subItems.map((subItem) => (
-                                            <li key={subItem.label} className="nav-item">
-                                                <a
-                                                    href={subItem.href}
-                                                    className={`nav-link ${isItemActive(subItem.href) ? 'active' : ''}`}
-                                                    style={{ display: 'flex', alignItems: 'center' }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation(); // Stop AdminLTE from seeing this click too
-                                                        if (subItem.href === '#') e.preventDefault();
-                                                    }}
-                                                >
-                                                    <i className={`${subItem.icon} nav-icon`} style={{ fontSize: '0.8rem' }}></i>
-                                                    <p style={{ marginLeft: '10px' }}>{subItem.label}</p>
-                                                </a>
-                                            </li>
-                                        ))}
+                        return (
+                            <div key={menu.label}>
+                                <button
+                                    onClick={() => handleSectionToggle(menu.label)}
+                                    className={`flex w-full items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium ${
+                                        sectionActive ? 'text-brand-700' : 'text-gray-700 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    <Icon size={18} className={sectionActive ? 'text-brand-600' : 'text-gray-400'} />
+                                    <span className="flex-1 text-left">{menu.label}</span>
+                                    <ChevronDown
+                                        size={15}
+                                        className={`text-gray-400 transition-transform ${expanded ? '' : '-rotate-90'}`}
+                                    />
+                                </button>
+
+                                {expanded && (
+                                    <ul className="mb-1 mt-0.5 ml-3.5 flex flex-col gap-0.5 border-l border-border pl-3">
+                                        {menu.subItems.map((sub) => {
+                                            const SubIcon = sub.icon;
+                                            const active = isItemActive(sub.href);
+                                            return (
+                                                <li key={sub.label}>
+                                                    <a
+                                                        href={sub.href}
+                                                        onClick={closeMobileDrawer}
+                                                        className={`flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm ${
+                                                            active
+                                                                ? 'bg-brand-600 font-medium text-white'
+                                                                : 'text-gray-600 hover:bg-gray-50 hover:text-brand-600'
+                                                        }`}
+                                                    >
+                                                        <SubIcon size={15} className={active ? 'text-white' : 'text-gray-400'} />
+                                                        {sub.label}
+                                                    </a>
+                                                </li>
+                                            );
+                                        })}
                                     </ul>
-                                </li>
-                            );
-                        })}
-                    </ul>
+                                )}
+                            </div>
+                        );
+                    })}
+
+                    {q && visibleSections.length === 0 && (
+                        <div className="px-2.5 py-4 text-sm text-gray-400">No menu items match “{query}”.</div>
+                    )}
                 </nav>
-            </div>
-        </aside>
+            </aside>
+        </>
     );
 };
 

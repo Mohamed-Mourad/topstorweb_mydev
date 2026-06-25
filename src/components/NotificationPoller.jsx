@@ -31,11 +31,11 @@ const NotificationPoller = () => {
         const el = document.getElementById('syncStatus');
         if (!el) return;
         if (isInsync === 'yes') {
-            el.innerHTML = 'Cluster <br><span>in Sync</span>';
+            el.innerHTML = 'Cluster <span>in Sync</span>';
             el.classList.remove('not-in-sync');
             el.classList.add('in-sync');
         } else {
-            el.innerHTML = 'Nodes <br><span>Not in Sync</span>';
+            el.innerHTML = 'Nodes <span>Not in Sync</span>';
             el.classList.remove('in-sync');
             el.classList.add('not-in-sync');
         }

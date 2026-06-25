@@ -1,122 +1,121 @@
 import React, { useState, useRef, useEffect } from 'react';
-import Button from './Button';
+import { ChevronDown, Check, X } from 'lucide-react';
 
-const Dropdown = ({ options, value, onChange, placeholder, disabled, className = "", isMulti = false, label }) => {
+/**
+ * Dropdown — QuickStor design-system select (single / multi).
+ * onChange returns a string (single) or string[] (multi). isMulti renders
+ * removable brand chips. Click-outside + Escape close.
+ */
+const Dropdown = ({ options, value, onChange, placeholder = 'Select…', disabled, className = '', isMulti = false, label }) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (containerRef.current && !containerRef.current.contains(event.target)) {
-                setIsOpen(false);
-            }
+            if (containerRef.current && !containerRef.current.contains(event.target)) setIsOpen(false);
         };
+        const handleKey = (e) => { if (e.key === 'Escape') setIsOpen(false); };
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleKey);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleKey);
+        };
     }, []);
 
-    const getSelectedLabel = () => {
-        if (isMulti) {
-            if (!Array.isArray(value) || value.length === 0) return placeholder;
-            if (value.length === 1) {
-                const opt = options.find(o => String(o.value) === String(value[0]));
-                return opt ? opt.label : placeholder;
-            }
-            return `${value.length} selected`;
-        } else {
-            const selectedOption = options.find(opt => String(opt.value) === String(value));
-            return selectedOption ? selectedOption.label : placeholder;
-        }
-    };
+    const isSelected = (optValue) =>
+        isMulti ? Array.isArray(value) && value.includes(optValue) : String(optValue) === String(value);
 
     const handleSelect = (optValue) => {
         if (isMulti) {
-            const newValue = value.includes(optValue)
-                ? value.filter(v => v !== optValue)
-                : [...value, optValue];
-            onChange(newValue);
+            const next = value.includes(optValue) ? value.filter((v) => v !== optValue) : [...value, optValue];
+            onChange(next);
         } else {
             onChange(optValue);
             setIsOpen(false);
         }
     };
 
-    const isSelected = (optValue) => {
-        if (isMulti) {
-            return Array.isArray(value) && value.includes(optValue);
-        }
-        return String(optValue) === String(value);
-    };
+    const selectedSingle = options.find((o) => String(o.value) === String(value));
+    const selectedChips = isMulti ? options.filter((o) => isSelected(o.value)) : [];
+    const hasValue = isMulti ? selectedChips.length > 0 : !!selectedSingle;
 
     return (
-        <div className={`space-y-2 ${className}`} ref={containerRef}>
-            {label && (
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 block">
-                    {label}
-                </label>
-            )}
+        <div className={`flex flex-col ${className}`} ref={containerRef}>
+            {label && <span className="mb-1.5 text-sm font-medium text-gray-700">{label}</span>}
             <div className="relative">
-                <div
-                    onClick={() => !disabled && setIsOpen(!isOpen)}
-                    className={`w-full px-4 h-[46px] bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-700 flex items-center justify-between cursor-pointer transition-all ${isOpen ? 'ring-2 ring-indigo-500 bg-white' : 'hover:bg-gray-100/80'
-                        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                <button
+                    type="button"
+                    onClick={() => !disabled && setIsOpen((o) => !o)}
+                    disabled={disabled}
+                    className={`flex w-full items-center justify-between gap-2 rounded-md border bg-surface px-3 py-2.5 text-left text-sm transition-colors ${
+                        isOpen ? 'border-brand-500 ring-4 ring-brand-100' : 'border-border'
+                    } ${disabled ? 'cursor-not-allowed bg-gray-50 text-gray-400' : 'hover:border-border-strong'}`}
                 >
-                    <span className={(!isMulti && (!value && value !== 0)) || (isMulti && (!value || value.length === 0)) ? 'text-gray-300' : ''}>
-                        {getSelectedLabel()}
-                    </span>
-                    <i className={`fas fa-chevron-down text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} style={{ fontSize: '0.8rem' }}></i>
-                </div>
+                    {isMulti ? (
+                        hasValue ? (
+                            <span className="flex flex-wrap gap-1.5">
+                                {selectedChips.map((opt) => (
+                                    <span
+                                        key={opt.value}
+                                        className="inline-flex items-center gap-1 rounded-sm bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700"
+                                    >
+                                        {opt.label}
+                                        {!disabled && (
+                                            <X
+                                                size={12}
+                                                className="cursor-pointer text-brand-400 hover:text-brand-700"
+                                                onClick={(e) => { e.stopPropagation(); handleSelect(opt.value); }}
+                                            />
+                                        )}
+                                    </span>
+                                ))}
+                            </span>
+                        ) : (
+                            <span className="text-gray-400">{placeholder}</span>
+                        )
+                    ) : (
+                        <span className={selectedSingle ? 'text-gray-800' : 'text-gray-400'}>
+                            {selectedSingle ? selectedSingle.label : placeholder}
+                        </span>
+                    )}
+                    <ChevronDown size={16} className={`flex-shrink-0 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                </button>
 
                 {isOpen && (
-                    <div className="absolute top-full left-0 w-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-[100] animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
-                        <div className="max-h-60 overflow-y-auto no-scrollbar">
+                    <div className="absolute left-0 top-full z-[100] mt-1 w-full overflow-hidden rounded-md border border-border bg-surface py-1 shadow-lg">
+                        <div className="max-h-60 overflow-y-auto">
                             {options.length === 0 ? (
-                                <div className="px-4 py-3 text-sm text-gray-400 font-medium italic text-center">No options available</div>
+                                <div className="px-3 py-2.5 text-center text-sm text-gray-400">No options available</div>
                             ) : (
-                                options.map((opt) => (
-                                    <div
-                                        key={opt.value}
-                                        onClick={() => handleSelect(opt.value)}
-                                        className={`px-4 py-3 text-sm font-bold transition-all cursor-pointer flex items-center justify-between ${isSelected(opt.value)
-                                            ? isMulti ? 'text-indigo-600 hover:bg-indigo-50' : 'bg-indigo-600 text-white'
-                                            : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-600'
+                                options.map((opt) => {
+                                    const sel = isSelected(opt.value);
+                                    return (
+                                        <button
+                                            type="button"
+                                            key={opt.value}
+                                            onClick={() => handleSelect(opt.value)}
+                                            className={`flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm transition-colors ${
+                                                sel ? 'bg-brand-50 font-medium text-brand-700' : 'text-gray-700 hover:bg-gray-50'
                                             }`}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            {isMulti && (
-                                                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${isSelected(opt.value) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-200 bg-white'}`}>
-                                                    {isSelected(opt.value) && <i className="fas fa-check text-[8px] text-white"></i>}
-                                                </div>
-                                            )}
-                                            <span>{opt.label}</span>
-                                        </div>
-                                        {!isMulti && isSelected(opt.value) && <i className="fas fa-check text-[10px]"></i>}
-                                    </div>
-                                ))
+                                        >
+                                            <span className="flex items-center gap-2.5">
+                                                {isMulti && (
+                                                    <span className={`flex h-4 w-4 items-center justify-center rounded border ${sel ? 'border-brand-600 bg-brand-600' : 'border-border bg-surface'}`}>
+                                                        {sel && <Check size={11} className="text-white" />}
+                                                    </span>
+                                                )}
+                                                {opt.label}
+                                            </span>
+                                            {!isMulti && sel && <Check size={14} className="text-brand-600" />}
+                                        </button>
+                                    );
+                                })
                             )}
                         </div>
-                        {isMulti && (
-                            <div className="p-3 border-t border-gray-50 flex justify-end bg-gray-50/50">
-                                <Button
-                                    onClick={() => setIsOpen(false)}
-                                    bgColor="bg-gray-900"
-                                    textColor="text-white"
-                                    borderRadius="rounded-xl"
-                                    className="!px-6 !py-2 text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all"
-                                >
-                                    Done
-                                </Button>
-                            </div>
-                        )}
                     </div>
                 )}
             </div>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                .no-scrollbar::-webkit-scrollbar { display: none; }
-                .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-            `}} />
         </div>
     );
 };

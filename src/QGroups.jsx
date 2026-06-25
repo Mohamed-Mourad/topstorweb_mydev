@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { fetchGroupList, fetchUserOptions, addGroup, deleteGroup, updateGroupUsers } from './api/groups';
+import { RefreshCw } from 'lucide-react';
 import Button from './components/Common/Button';
 import AddGroupForm from './components/AddGroupForm';
 import GroupList from './components/GroupList';
@@ -65,36 +66,28 @@ const QGroups = () => {
     return (
         <div className="content-wrapper">
             <div className="floating-canvas">
-                <div className="content-header px-4">
+                {/* Page header */}
+                <div className="content-header">
                     <div className="container-fluid">
-                        <div className="flex justify-between items-center mb-10">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                             <div>
-                                <p className="text-lg text-gray-500 font-medium tracking-tight">Manage system groups, permissions, and directory memberships</p>
+                                <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Group Management</h1>
+                                <p className="mt-1 text-sm text-gray-500">Manage system groups, permissions, and directory memberships</p>
                             </div>
-                            <div className="flex gap-3">
-                                <Button
-                                    onClick={loadData}
-                                    bgColor="bg-white"
-                                    textColor="text-gray-700"
-                                    className="border border-gray-200 hover:bg-gray-50 hover:text-blue-600 rounded-xl"
-                                    icon={<i className="fas fa-sync-alt opacity-70"></i>}
-                                >
-                                    Sync Now
-                                </Button>
-                            </div>
+                            <Button
+                                onClick={loadData}
+                                variant="secondary"
+                                icon={<RefreshCw size={15} className={loading ? 'animate-spin' : ''} />}
+                            >
+                                Sync Now
+                            </Button>
                         </div>
                     </div>
                 </div>
 
-                <div className="content px-4">
-                    <div className="container-fluid space-y-8">
-                        {/* Add Group Section */}
-                        <AddGroupForm
-                            users={users}
-                            onAdd={handleAddGroup}
-                        />
-
-                        {/* Group List Section */}
+                <div className="content">
+                    <div className="container-fluid space-y-6">
+                        <AddGroupForm users={users} onAdd={handleAddGroup} />
                         <GroupList
                             groups={groups}
                             users={users}

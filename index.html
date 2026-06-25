@@ -6,17 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>QuickStor - React</title>
 
-  <!-- CSS Links from Qnodes.html -->
-  <link rel="stylesheet" href="/dist/css/fonts/google-fonts.css">
+  <!-- Runtime CSS deps still needed by legacy bits:
+       FontAwesome → child components' `fas fa-*` icons
+       select2 (+ bootstrap4 theme) → RunningNodes node-config multi-selects
+       AdminLTE, Qmain, Dosis font, overlayScrollbars removed — superseded by the
+       QuickStor design system (src/index.css). -->
   <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
-  <link rel="stylesheet" href="/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
   <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
   <link rel="stylesheet" href="/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-  <link rel="stylesheet" href="/dist/css/Qmain.css">
-  <link rel="stylesheet" href="/plugins/gfont/QuickStor.css">
-  <!-- <link rel="stylesheet" href="/dist/css/pumping.css"> -->
-  <!-- <link rel="stylesheet" href="/dist/css/syncStatus.css"> -->
-  <link rel="stylesheet" href="/dist/css/adminlte.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed no_scroll_overlay">

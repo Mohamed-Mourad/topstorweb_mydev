@@ -21,8 +21,17 @@ import Sidebar from './components/Sidebar';
 import NotificationPoller from './components/NotificationPoller';
 
 function App() {
+    // Skip the login screen during local dev (vite dev server). Always false in
+    // production builds, so the VM still enforces auth.
+    const DEV_BYPASS_AUTH = import.meta.env.DEV;
+
+    const hasToken = () => {
+        const token = localStorage.getItem('token');
+        return !!token && token !== '0';
+    };
+
     const [view, setView] = React.useState('nodes');
-    const [isAuthenticated, setIsAuthenticated] = React.useState(!!localStorage.getItem('token') && localStorage.getItem('token') !== '0');
+    const [isAuthenticated, setIsAuthenticated] = React.useState(DEV_BYPASS_AUTH || hasToken());
 
     React.useEffect(() => {
         const handleHashChange = () => {
@@ -49,8 +58,7 @@ function App() {
 
         // Check auth status periodically or on focus
         const checkAuth = () => {
-            const token = localStorage.getItem('token');
-            setIsAuthenticated(!!token && token !== '0');
+            setIsAuthenticated(DEV_BYPASS_AUTH || hasToken());
         };
         window.addEventListener('storage', checkAuth);
 
